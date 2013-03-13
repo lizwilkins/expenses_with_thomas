@@ -27,18 +27,37 @@ def expense_menu
   end
 end
 
-def list_expenses
-  if Expense.all.length != 0
-    puts "Here are your expenses:"
-    puts "ID     Date     Amount    Category    Name"
-    #uts "##   mm/dd/yy   $11.11    General    an expense"
-    Expense.all.each do |expense|
-      puts "#{expense.id}   $#{expense.amount}   #{expense.category_id}    #{expense.name}"
-    end
-  else
-    puts "You have no expenses, Dawg."
-  end
-end
+# def list_expenses
+#   unless Expense.all.length == 0
+#     puts "How would you like to sort your expenses?"
+#     puts "Press: | To sort by:"
+#     puts "  C    |  Category"
+#     puts "  A    |   Amount"
+#     puts "  N    |    Name"
+#     puts "  D    |    Date"
+#     putd "  I    |     ID"
+#     search_method_choice = gets.chomp.upcase
+#     case search_method_choice
+#     when 'C'
+#     when 'A'
+#     when 'N'
+#     when 'D'
+#     when 'I'
+#     else
+#     end
+#     puts "Here are your expenses:"
+#     puts "ID     Date     Amount    Category    Name"
+#     #uts "##   mm/dd/yy   $11.11    General    an expense"
+#     Expense.all.each do |expense|
+#       puts "#{expense.id}   $#{expense.amount}   #{expense.category_id}    #{expense.name}"
+#     end
+#   else
+#     puts "You have no expenses, Dawg."
+#   end
+# end
+
+# def expense_list_by_id
+# end
 
 def add_expense
   choice = nil

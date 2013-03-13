@@ -12,3 +12,12 @@ ActiveRecord::Base.establish_connection(development_configuation)
 def input_error
   puts "FAIL! Try again!"
 end
+
+def input_error_for(valid_inputs)
+  puts "Invalid entry."
+  puts "Valid entries were: #{valid_inputs.each {|input| = input.capitalize}.join(', ')}."
+end
+
+def empty_expense_list
+  puts "No expenses were found."
+end
