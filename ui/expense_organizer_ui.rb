@@ -20,7 +20,7 @@ def menu
     when 'x'
       exit
     else
-      puts "FAIL! Try again!"
+      puts input_error
     end
   end
 end
