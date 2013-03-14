@@ -1,5 +1,20 @@
-require './ui_helper.rb'
-
+# require './ui_helper.rb'
+    puts "How would you like to sort your expenses?"
+    puts "Press: | To sort by:"
+    puts "  C    |  Category"
+    puts "  A    |   Amount"
+    puts "  N    |    Name"
+    puts "  D    |    Date"
+    putd "  I    |     ID"
+    search_method_choice = gets.chomp.upcase
+    case search_method_choice
+    when 'C'
+    when 'A'
+    when 'N'
+    when 'D'
+    when 'I'
+    else
+    end
 def list_expenses
   unless Expense.all.length == 0
     puts "How would you like to sort your expenses?"

@@ -3,11 +3,16 @@ require './ui_helper.rb'
 def expense_menu
   puts "\nExpense Menu Options"
   choice = nil
+  if Category.find(1) == nil
+    Category.new(:id => 1, :name => "undecided").save
+  end
+
   until choice == 'x'
     puts "Press 'x' to return to the previous menu."
     puts "Press 'a' add an expense."
     puts "Press 'd' delete an expense."
     puts "Press 'e' edit an expense."
+    puts "Press 'v' to view an expense."
     puts "Press 'l' list expenses."
     choice = gets.chomp.downcase
     case choice
@@ -19,6 +24,8 @@ def expense_menu
       edit_expense
     when 'l'
       list_expenses
+    when 'v'
+      view_expense(nil)
     when 'x'
       return "Returning to the previous menu..."
     else
@@ -29,38 +36,26 @@ end
 
 # def list_expenses
 #   unless Expense.all.length == 0
-#     puts "How would you like to sort your expenses?"
-#     puts "Press: | To sort by:"
-#     puts "  C    |  Category"
-#     puts "  A    |   Amount"
-#     puts "  N    |    Name"
-#     puts "  D    |    Date"
-#     putd "  I    |     ID"
-#     search_method_choice = gets.chomp.upcase
-#     case search_method_choice
-#     when 'C'
-#     when 'A'
-#     when 'N'
-#     when 'D'
-#     when 'I'
-#     else
-#     end
 #     puts "Here are your expenses:"
 #     puts "ID     Date     Amount    Category    Name"
 #     #uts "##   mm/dd/yy   $11.11    General    an expense"
 #     Expense.all.each do |expense|
-#       puts "#{expense.id}   $#{expense.amount}   #{expense.category_id}    #{expense.name}"
+#       print "#{expense.id}   $#{expense.amount}   "
+#       begin
+#         category_name = Category.find(category_id).name
+#       rescue ActiveRecord::RecordNotFound
+#         category_name = "invalid category"
+#       end
+#       puts "#{category_name}    #{expense.name}"
 #     end
 #   else
 #     puts "You have no expenses, Dawg."
 #   end
 # end
 
-# def expense_list_by_id
-# end
-
 def add_expense
   choice = nil
+  category_id = 1
   until choice == 'x'
     puts "\nOptions for New Expense:"
     puts "Press 'x' to return to the previous menu."
@@ -83,11 +78,12 @@ def add_expense
     when 's'
       save_expense(Expense.new(:name => name, :expense_date => date, 
                                :amount => amount, :category_id => category_id))
+      return "Returning to the previous menu..."
     when 'v'
       view_expense(Expense.new(:name => name, :expense_date => date, 
                                :amount => amount, :category_id => category_id))
     when 'x'
-      return
+      return "Returning to the previous menu..."
     else
       puts input_error
     end
@@ -107,6 +103,10 @@ def edit_expense
       edit_expense
     end
     view_expense(expense)
+    name = expense.name
+    date = expense.expense_date
+    amount = expense.amount
+    category_id = expense.category_id
     until choice == 'x'
       puts "\nOptions for Editing an Expense:"
       puts "Press 'x' to return to the previous menu."
@@ -127,11 +127,13 @@ def edit_expense
       when 'c'
         category_id = enter_category
       when 's'
-        update_expense(expense)
+        update_expense(expense, Expense.new(:name => name, :expense_date => date, 
+                               :amount => amount, :category_id => category_id))
       when 'v'
-        view_expense(expense)
+        view_expense(Expense.new(:name => name, :expense_date => date, 
+                               :amount => amount, :category_id => category_id))
       when 'x'
-        return
+        return "Returning to the previous menu..."
       else
         puts input_error
       end
@@ -169,12 +171,17 @@ def delete_expense
 end
 
 def view_expense(expense)
+  if expense == nil
+    list_expenses
+    print "Enter the expense ID: "
+    expense = Expense.find(gets.chomp.to_i)
+  end
   puts "Info for New Expense"
   puts "Date:  #{expense.expense_date}"
   puts "Amount:  $#{expense.amount}"
   puts "Name:  #{expense.name}"
   if expense.category_id
-    puts "Category: #{expense.category}"
+    puts "Category: #{Category.find(expense.category_id).name}"   #check for bad id
   else
     puts "Category: "
   end
@@ -187,7 +194,8 @@ def save_expense(expense)
     print "Save data (y/n):  "
     if gets.chomp.downcase == 'y'
       if expense.save
-        "Entry saved!"
+        puts "Entry saved!"
+        new_tie = Ty.new(:expense_id => expense.id, :category_id => expense.category_id).save  # check for failure
       else
         puts "'#{expense.name}' was not saved (errors)."
         expense.errors.full_messages.each {|message| puts message}
@@ -198,20 +206,20 @@ def save_expense(expense)
   end
 end
 
-def update_expense(expense)
-  if expense.name.length != 0
+def update_expense(expense, updated_expense)
+  if updated_expense.name.length != 0
     puts "Review your data for entry:"
-    view_expense(expense)
+    view_expense(updated_expense)
     print "Save data (y/n):  "
     if gets.chomp.downcase == 'y'
-      expense.update_attributes(:name => expense.name, :expense_date => date, 
-                                :amount => amount, :category_id => category_id))
-      if worked  # need result
-        "Entry updated!"
-      else
-        puts "Changes to '#{expense.name}' were not saved (errors)."
-        expense.errors.full_messages.each {|message| puts message}
-      end
+      expense.update_attributes(:name => updated_expense.name, :expense_date => updated_expense.expense_date, 
+                                :amount => updated_expense.amount, :category_id => updated_expense.category_id)
+      # if worked  # need result
+      #   "Entry updated!"
+      # else
+      #   puts "Changes to '#{expense.name}' were not saved (errors)."
+      #   expense.errors.full_messages.each {|message| puts message}
+      # end
     end
   else
     puts "Expense must have a name field, please add one."
@@ -224,8 +232,11 @@ def enter_name
 end
 
 def enter_date
-  print "Enter the date (mm/dd/yy):"
+  print "Enter the date:"
+  puts "Example: 2011/07/25"
+  print "(YYYY/MM/DD): "
   date = gets.chomp
+  p date
 end
 
 def enter_amount
@@ -239,9 +250,9 @@ def enter_category
   else
     puts "You don't have any categories, yet."
   end
-  print "Do you want to enter a new category (y/n): "
+  print "Do you want to use one of these categories (y/n): "
   choice = gets.chomp.downcase
-  if choice == 'y'
+  if choice == 'n'
     add_category
     list_categories
   end

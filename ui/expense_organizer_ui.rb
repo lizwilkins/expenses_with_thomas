@@ -10,13 +10,19 @@ def menu
   until choice == 'x'
     puts "Press 'c' for Category management."
     puts "Press 'e' for Expense management."
+    puts "Press 'r' for Report Generation"
     puts "Press 'x' to eXit."
+    puts "Press 's' to search expenses."
     choice = gets.chomp.downcase
     case choice
     when 'e'
       expense_menu
     when 'c'
       category_menu
+    when 'r'
+      search_menu
+    when 's'
+      search_by_category
     when 'x'
       exit
     else

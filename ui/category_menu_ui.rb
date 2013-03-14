@@ -27,17 +27,17 @@ def category_menu
   end
 end
 
-def list_categories
-  if Category.all.length != 0
-    puts "\nHere are your categories"
-    puts "ID    Category"
-    Category.all.each do |category|
-      puts "#{category.id}   #{category.name}"
-    end
-  else
-    puts "You have no categories."
-  end
-end
+# def list_categories
+#   if Category.all.length != 0
+#     puts "\nHere are your categories"
+#     puts "ID    Category"
+#     Category.all.each do |category|
+#       puts "#{category.id}   #{category.name}"
+#     end
+#   else
+#     puts "You have no categories."
+#   end
+# end
 
 def add_category
   unless Category.all.length == 0
@@ -54,6 +54,10 @@ def delete_category
     list_categories
     puts "Enter the ID of the category you wish to delete:"
     category_id = gets.chomp.to_i
+    if category_id == 1
+      puts "You can't delete this category."
+      delete_category
+    end
     begin
       category = Category.find(category_id)
     rescue ActiveRecord::RecordNotFound
@@ -81,6 +85,10 @@ def edit_category
     list_categories
     puts "Enter the ID of the category you wish to edit:"
     category_id = gets.chomp
+    if category_id == 1
+      puts "You can't modify this category."
+      edit_category
+    end    
     begin
       category = Category.find(category_id)
     rescue ActiveRecord::RecordNotFound
